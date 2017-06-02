@@ -12,10 +12,19 @@ def optimizedProjection(Dr, D):
 	DrDT = np.matmul(Dr, D.T)
 	return np.matmul(InvDrDrT, DrDT)
 
+def readTextFiles(filename, start, end):
+	sizes = end - start
+	FrameData = np.zeros((sizes, 28))
+	for i in range(sizes):
+		f = pd.read_csv(filename + str(start + i) + '.txt', header=None)
+		Array = f.values.astype(float)
+		FrameData[i,:] = (Array[:,0])
 
 #================================
 # Offline Process
 #================================
+
+readTextFiles('Coeff\BSCoeff', 31, 50)
 
 # loading source and target weights files
 ## source
