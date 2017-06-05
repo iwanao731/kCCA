@@ -3,9 +3,11 @@ import numpy as np
 import pandas as pd
 from scipy.linalg import sqrtm
 
+# polynomial kernel (two degree)
 def kernelFunction(a,b):
 	w = np.matmul(a.T, b)
-	return np.dot(w, w)
+	print("kernel value : ", w) 
+	return pow(w, 2)
 
 def optimizedProjection(Dr, D):
 	InvDrDrT = np.linalg.inv(np.matmul(Dr, Dr.T))
@@ -54,21 +56,15 @@ Kd = np.matmul(D.T, D)
 print("Kd : \n", Kd)
 
 # Fc, Fd
-Kc2 = Kc * Kc
-print("Kc2 : \n", Kc2)
-
-Kc2 = np.matmul(Kc, Kc) # Kc2 = Kc * Kc
-print("Kc2 : \n", Kc2)
-
-Kc2 = np.matmul(Kc, Kc) # Kc2 = Kc * Kc
-Kd2 = np.matmul(Kd, Kd) # Kd * Kd
-SqrtKc2Kd2 = np.matmul(sqrtm(Kc2), sqrtm(Kd2)) # sqrtm(Kc2) * sqrtm(Kd2)
-InvSqrtKc2Kd2 = np.linalg.inv(SqrtKc2Kd2)
-UDVT = np.matmul(np.matmul(Kc, Kd), InvSqrtKc2Kd2)
+Kc2 = np.matmul(Kc, Kc)
+Kd2 = np.matmul(Kd, Kd)
+InvSqrtKc2 = np.linalg.inv(sqrtm(Kc2))
+InvSqrtKd2 = np.linalg.inv(sqrtm(Kd2))
+KcKd = np.matmul(Kc, Kd)
+UDVT = np.matmul(np.matmul(InvSqrtKc2, KcKd), InvSqrtKd2)
 U, s, V = np.linalg.svd(UDVT, full_matrices=True)
-
-Fc = np.matmul(Kc, U)	# dubious
-Fd = np.matmul(Kd, V)	# dubious
+Fc = np.matmul(InvSqrtKc2, U)
+Fd = np.matmul(InvSqrtKd2, V)
 
 # reduce
 Fc = Fc[:NF, :]
@@ -80,7 +76,6 @@ print("Fd : ", Fd.shape)
 # Cr, Dr
 Cr = np.zeros((NF, NP))
 Dr = np.zeros((NF, NP))
-
 kc = np.zeros((NP, NP))
 kd = np.zeros((NP, NP))
 for i in range(NP):
@@ -111,8 +106,8 @@ print(Md)
 # Online Process
 #================================
 
-c_new = C[:,5]
-# c_new = np.random.random((NS, 1))
+# c_new = C[:,5]
+c_new = np.random.random((NS, 1))
 print("c_new ; \n", c_new)
 
 kernlized_Cnew = np.zeros((NP,1))
