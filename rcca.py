@@ -41,17 +41,21 @@ D = df.values.astype(float)
 print("target shape : ", D.shape)
 # print(D)
 
-## modified for computing inverse matrix for C and D
+## modified oritinal data to compute inverse matrix for C and D
 C += np.random.random(C.shape) / 10.0
 D += np.random.random(D.shape) / 10.0
 
 # define the sourace and target dimention
+# NS : Number of source weights
+# NT : Number of target weights
+# NP : Number of pair data
+# NF : Number of reduced dimension
 NS, NP = C.shape
 NT, NP = D.shape
 NF = 10
 
 # kernelized vector in eq. (6)
-Kc = kernelFunction(C,C)	# dubious
+Kc = kernelFunction(C,C)
 Kd = np.matmul(D.T, D)
 print("Kd : \n", Kd)
 
@@ -74,8 +78,6 @@ print("Fd : ", Fd.shape)
 # print("Fc : ", Fc)
 
 # Cr, Dr
-Cr = np.zeros((NF, NP))
-Dr = np.zeros((NF, NP))
 kc = np.zeros((NP, NP))
 kd = np.zeros((NP, NP))
 for i in range(NP):
@@ -83,6 +85,8 @@ for i in range(NP):
 		kc[i][j] = kernelFunction(C[:,i],C[:,j])
 		kd[i][j] = kernelFunction(D[:,i],D[:,j])
 
+Cr = np.zeros((NF, NP))
+Dr = np.zeros((NF, NP))
 for i in range(NP):
 	Cr[:,i] = (np.matmul(Fc, kc[i])).T
 	Dr[:,i] = (np.matmul(Fd, kc[i])).T
